@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<link rel="manifest" href="manifest.json">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0d2b23">
+<title>مسابقة السيرة النبوية — احتفالاً بالمولد النبوي الشريف</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --night: #0d2b23;
+    --deep: #143b30;
+    --emerald: #1b4a3a;
+    --gold: #c9a24b;
+    --gold-light: #e8cd8a;
+    --ivory: #f6efdd;
+    --ivory-dim: #e9dfc4;
+    --maroon: #7a2e2e;
+    --ink: #1e1b12;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 50% -10%, #1f5744 0%, var(--night) 55%),
+      var(--night);
+    font-family:'Tajawal', sans-serif;
+    color:var(--ivory);
+    display:flex;
+    justify-content:center;
+    padding:0;
+    position:relative;
+    overflow-x:hidden;
+  }
+  /* ---------- app shell (phone frame) ---------- */
+  .app-shell{
+    width:100%;
+    max-width:430px;
+    min-height:100vh;
+    background:transparent;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    box-shadow:0 0 60px rgba(0,0,0,.5);
+  }
+  @media (min-width:460px){
+    body{padding:24px 0;}
+    .app-shell{min-height:calc(100vh - 48px); border-radius:36px; overflow:hidden; border:1px solid rgba(201,162,75,.25);}
+  }
+  .app-topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 16px 8px;
+    position:sticky; top:0; z-index:5;
+    background:linear-gradient(180deg, var(--night) 60%, rgba(13,43,35,.85) 85%, transparent);
+  }
+  .app-topbar .nav-btn{
+    display:flex; align-items:center; gap:6px;
+    background:rgba(233,207,138,.1); border:1px solid rgba(201,162,75,.4);
+    color:var(--gold-light); font-size:.82rem; font-weight:500;
+    padding:7px 13px; border-radius:20px;
+  }
+  .app-topbar .nav-btn:active{background:rgba(233,207,138,.22);}
+  .app-topbar .spacer{flex:1;}
+  .app-body{flex:1; padding:0 16px 24px; overflow-y:auto;}
+  /* geometric star field backdrop */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, rgba(233,207,138,.35) 50%, transparent 51%),
+      radial-gradient(1px 1px at 70% 60%, rgba(233,207,138,.25) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 40% 80%, rgba(233,207,138,.3) 50%, transparent 51%),
+      radial-gradient(1px 1px at 85% 20%, rgba(233,207,138,.25) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 10% 65%, rgba(233,207,138,.3) 50%, transparent 51%),
+      radial-gradient(1px 1px at 60% 12%, rgba(233,207,138,.3) 50%, transparent 51%);
+    pointer-events:none;
+  }
+  .wrap{width:100%; position:relative; z-index:1;}
+
+  /* ---------- header ---------- */
+  .top-orn{
+    display:flex; justify-content:center; margin-bottom:6px;
+  }
+  .top-orn svg{width:120px; height:auto; opacity:.85;}
+  h1.title{
+    font-family:'Amiri', serif;
+    font-weight:700;
+    text-align:center;
+    font-size:1.9rem;
+    margin:4px 0 2px;
+    color:var(--gold-light);
+    letter-spacing:.5px;
+  }
+  .subtitle{
+    text-align:center;
+    color:var(--ivory-dim);
+    font-size:.95rem;
+    margin-bottom:18px;
+    font-weight:300;
+  }
+  .divider{
+    display:flex; align-items:center; gap:10px; margin:14px 0 22px;
+  }
+  .divider .line{flex:1; height:1px; background:linear-gradient(90deg, transparent, var(--gold), transparent);}
+  .divider .diamond{width:8px;height:8px; background:var(--gold); transform:rotate(45deg);}
+
+  /* ---------- lantern scoreboard ---------- */
+  .scoreboard{
+    display:flex; justify-content:space-between; gap:12px; margin-bottom:20px;
+  }
+  .player-card{
+    flex:1;
+    background:linear-gradient(180deg, rgba(233,207,138,.08), rgba(233,207,138,.02));
+    border:1px solid rgba(201,162,75,.4);
+    border-radius:14px;
+    padding:12px 10px;
+    text-align:center;
+  }
+  .player-card .name{
+    font-weight:700; color:var(--gold-light); font-size:.95rem; margin-bottom:6px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .lanterns{display:flex; justify-content:center; gap:4px; flex-wrap:wrap;}
+  .lantern{width:16px; height:20px; opacity:.25; transition:opacity .3s, transform .3s;}
+  .lantern.lit{opacity:1; transform:scale(1.08);}
+  .score-num{margin-top:6px; font-family:'Amiri',serif; font-size:1.1rem; color:var(--ivory);}
+
+  /* ---------- cards / panels ---------- */
+  .panel{
+    background:linear-gradient(180deg, rgba(246,239,221,.06), rgba(246,239,221,.02));
+    border:1px solid rgba(201,162,75,.35);
+    border-radius:18px;
+    padding:22px 20px;
+    position:relative;
+  }
+  .arch{
+    position:relative;
+    border-top-left-radius:120px 60px;
+    border-top-right-radius:120px 60px;
+    padding-top:34px;
+  }
+  .arch::before{
+    content:"";
+    position:absolute; top:14px; left:50%; transform:translateX(-50%);
+    width:60%; height:1px;
+    background:linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  /* setup screen */
+  label.field-label{
+    display:block; margin:14px 0 6px; color:var(--ivory-dim); font-size:.9rem;
+  }
+  input[type=text]{
+    width:100%; padding:11px 14px; border-radius:10px; border:1px solid rgba(201,162,75,.5);
+    background:rgba(0,0,0,.2); color:var(--ivory); font-family:'Tajawal',sans-serif; font-size:1rem;
+  }
+  input[type=text]::placeholder{color:rgba(246,239,221,.4);}
+
+  button{
+    font-family:'Tajawal',sans-serif;
+    cursor:pointer;
+    border:none;
+  }
+  .btn-primary{
+    display:block; width:100%; margin-top:22px;
+    background:linear-gradient(180deg, var(--gold-light), var(--gold));
+    color:#231a06; font-weight:900; font-size:1.05rem;
+    padding:13px; border-radius:12px;
+    box-shadow:0 6px 18px rgba(201,162,75,.25);
+  }
+  .btn-primary:active{transform:translateY(1px);}
+  .btn-ghost{
+    display:block; width:100%; margin-top:10px;
+    background:transparent; border:1px solid rgba(233,207,138,.4);
+    color:var(--ivory-dim); font-weight:500; font-size:.9rem;
+    padding:10px; border-radius:12px;
+  }
+
+  /* age / difficulty selector */
+  .age-options{display:flex; gap:10px; margin-top:6px;}
+  .age-opt{
+    flex:1; text-align:center; cursor:pointer;
+    background:rgba(246,239,221,.04); border:1.5px solid rgba(201,162,75,.35);
+    border-radius:14px; padding:14px 8px;
+  }
+  .age-opt .aicon{font-size:1.6rem; display:block; margin-bottom:4px;}
+  .age-opt .alabel{font-weight:700; font-size:.88rem; color:var(--ivory);}
+  .age-opt .asub{font-size:.68rem; color:var(--ivory-dim); margin-top:2px;}
+  .age-opt.selected{
+    border-color:var(--gold); background:rgba(201,162,75,.16);
+    box-shadow:0 0 0 1px rgba(201,162,75,.4) inset;
+  }
+
+  /* category grid — "أبواب" doors */
+  .doors{
+    display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px;
+  }
+  .door{
+    background:linear-gradient(180deg, rgba(233,207,138,.09), rgba(233,207,138,.02));
+    border:1px solid rgba(201,162,75,.4);
+    border-radius:14px 14px 8px 8px;
+    padding:16px 10px 14px;
+    text-align:center;
+    position:relative;
+  }
+  .door .icon{font-size:1.6rem; display:block; margin-bottom:6px;}
+  .door .cname{font-weight:700; color:var(--ivory); font-size:.92rem; line-height:1.4;}
+  .door .cprog{font-size:.72rem; color:var(--gold-light); margin-top:6px;}
+  .door.done{opacity:.45;}
+  .door.hard{border-color:rgba(122,46,46,.65); background:linear-gradient(180deg, rgba(122,46,46,.14), rgba(233,207,138,.02));}
+  .level-badge{
+    display:inline-block; font-size:.62rem; padding:2px 8px; border-radius:10px; margin-top:5px;
+    background:rgba(201,162,75,.22); color:var(--gold-light); border:1px solid rgba(201,162,75,.4);
+  }
+  .door.hard .level-badge{background:rgba(122,46,46,.3); color:#f0c9c9; border-color:rgba(122,46,46,.6);}
+  .door-btn{
+    position:absolute; inset:0; background:transparent; border-radius:inherit;
+  }
+
+  /* question screen */
+  .turn-tag{
+    display:inline-block; background:rgba(201,162,75,.18); border:1px solid rgba(201,162,75,.5);
+    color:var(--gold-light); font-size:.78rem; padding:4px 12px; border-radius:20px; margin-bottom:12px;
+  }
+  .cat-tag{color:var(--ivory-dim); font-size:.78rem; margin-bottom:4px;}
+  .q-text{
+    font-family:'Amiri', serif; font-size:1.25rem; line-height:1.7; color:var(--ivory);
+    margin:10px 0 18px;
+  }
+  .choices{display:flex; flex-direction:column; gap:10px;}
+  .choice{
+    text-align:right;
+    background:rgba(246,239,221,.05);
+    border:1px solid rgba(233,207,138,.3);
+    color:var(--ivory);
+    padding:12px 16px; border-radius:12px; font-size:.98rem;
+    transition:background .2s, border-color .2s;
+  }
+  .choice:not(:disabled):hover{background:rgba(233,207,138,.12);}
+  .choice.correct{background:rgba(90,160,110,.28); border-color:#5aa06e; color:#eaffe f;}
+  .choice.wrong{background:rgba(122,46,46,.35); border-color:var(--maroon);}
+  .choice:disabled{cursor:default;}
+
+  .explain{
+    margin-top:16px; padding:14px 16px; border-radius:12px;
+    background:rgba(0,0,0,.2); border-right:3px solid var(--gold);
+    font-size:.92rem; line-height:1.7; color:var(--ivory-dim);
+    display:none;
+  }
+  .explain.show{display:block;}
+
+  .next-btn{display:none;}
+  .next-btn.show{display:block;}
+
+  /* end screen */
+  .winner{
+    text-align:center; font-family:'Amiri',serif; font-size:1.6rem; color:var(--gold-light);
+    margin:6px 0 4px;
+  }
+  .final-scores{
+    display:flex; justify-content:center; gap:26px; margin:18px 0;
+  }
+  .final-scores div{text-align:center;}
+  .final-scores .fname{color:var(--ivory-dim); font-size:.85rem;}
+  .final-scores .fnum{font-family:'Amiri',serif; font-size:1.8rem; color:var(--gold-light);}
+  .lantern-row{display:flex; justify-content:center; gap:6px; margin:20px 0; flex-wrap:wrap;}
+
+  .screen{display:none;}
+  .screen.active{display:block;}
+
+  footer.note{
+    text-align:center; color:rgba(246,239,221,.35); font-size:.75rem; margin-top:26px; line-height:1.8;
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <div class="app-topbar" id="topbar-categories" style="display:none;">
+    <button class="nav-btn" onclick="goHome()">🏠 الرئيسية</button>
+    <span class="spacer"></span>
+    <button class="nav-btn" onclick="showEndIfPlayed()">🏁 النتيجة</button>
+  </div>
+
+  <div class="app-topbar" id="topbar-question" style="display:none;">
+    <button class="nav-btn" onclick="backToCategories()">→ رجوع للأبواب</button>
+    <span class="spacer"></span>
+    <button class="nav-btn" onclick="goHome()">🏠</button>
+  </div>
+
+  <div class="app-topbar" id="topbar-end" style="display:none;">
+    <button class="nav-btn" onclick="goHome()">🏠 الرئيسية</button>
+  </div>
+
+<div class="app-body">
+<div class="wrap">
+
+  <div class="top-orn">
+    <svg viewBox="0 0 200 60" fill="none">
+      <path d="M100 5 L108 22 L127 22 L112 33 L118 51 L100 40 L82 51 L88 33 L73 22 L92 22 Z" fill="#c9a24b" opacity="0.85"/>
+      <path d="M10 30 H85 M115 30 H190" stroke="#c9a24b" stroke-width="1" opacity="0.6"/>
+    </svg>
+  </div>
+  <h1 class="title">مسابقة السيرة النبوية</h1>
+  <div class="subtitle">لعبة نتشارك فيها فرحة ذكرى المولد النبوي الشريف ﷺ</div>
+
+  <div class="divider"><div class="line"></div><div class="diamond"></div><div class="line"></div></div>
+
+  <div class="scoreboard" id="scoreboard" style="display:none;">
+    <div class="player-card">
+      <div class="name" id="p1-name">اللاعب الأول</div>
+      <div class="lanterns" id="p1-lanterns"></div>
+      <div class="score-num" id="p1-score">0</div>
+    </div>
+    <div class="player-card">
+      <div class="name" id="p2-name">اللاعب الثاني</div>
+      <div class="lanterns" id="p2-lanterns"></div>
+      <div class="score-num" id="p2-score">0</div>
+    </div>
+  </div>
+
+  <!-- SETUP SCREEN -->
+  <div class="screen active panel arch" id="screen-setup">
+    <p style="text-align:center; color:var(--ivory-dim); font-size:.92rem; margin-top:0;">
+      اختارا الفئة العمرية المناسبة، وأدخلا اسميكما لتبدآ رحلة معرفية جميلة في سيرة الحبيب المصطفى ﷺ.
+    </p>
+    <label class="field-label">الفئة العمرية / المستوى</label>
+    <div class="age-options">
+      <div class="age-opt selected" id="age-easy" onclick="selectAge('easy')">
+        <span class="aicon">🧒</span>
+        <div class="alabel">للأطفال والعائلة</div>
+        <div class="asub">أسئلة سهلة وواضحة</div>
+      </div>
+      <div class="age-opt" id="age-hard" onclick="selectAge('hard')">
+        <span class="aicon">🧑‍🎓</span>
+        <div class="alabel">للشباب والكبار</div>
+        <div class="asub">مستوى صعب جداً</div>
+      </div>
+    </div>
+    <label class="field-label">اسم اللاعب الأول (مثلاً: الزوج)</label>
+    <input type="text" id="input-p1" placeholder="اكتب الاسم هنا">
+    <label class="field-label">اسم اللاعب الثاني (مثلاً: الزوجة)</label>
+    <input type="text" id="input-p2" placeholder="اكتب الاسم هنا">
+    <button class="btn-primary" onclick="startGame()">ابدآ اللعب معاً ✨</button>
+  </div>
+
+  <!-- CATEGORY SCREEN -->
+  <div class="screen panel" id="screen-categories">
+    <p style="text-align:center; color:var(--ivory-dim); font-size:.9rem; margin-top:0;">اختارا باباً من أبواب السيرة</p>
+    <div class="doors" id="doors"></div>
+    <button class="btn-ghost" onclick="showEndIfPlayed()">إنهاء اللعبة وعرض النتيجة</button>
+  </div>
+
+  <!-- QUESTION SCREEN -->
+  <div class="screen panel arch" id="screen-question">
+    <div class="cat-tag" id="q-cat"></div>
+    <div class="turn-tag" id="q-turn"></div>
+    <div class="q-text" id="q-text"></div>
+    <div class="choices" id="q-choices"></div>
+    <div class="explain" id="q-explain"></div>
+    <button class="btn-primary next-btn" id="btn-next" onclick="nextAfterAnswer()">التالي</button>
+  </div>
+
+  <!-- END SCREEN -->
+  <div class="screen panel arch" id="screen-end">
+    <div class="winner" id="end-winner"></div>
+    <div class="final-scores">
+      <div><div class="fname" id="end-p1-name"></div><div class="fnum" id="end-p1-score"></div></div>
+      <div><div class="fname" id="end-p2-name"></div><div class="fnum" id="end-p2-score"></div></div>
+    </div>
+    <div class="lantern-row" id="end-lanterns"></div>
+    <p style="text-align:center; color:var(--ivory-dim); font-size:.9rem;">
+      اللهم صلِّ وسلم على نبينا محمد، وتقبل منا هذه الذكرى الطيبة 🌙
+    </p>
+    <button class="btn-primary" onclick="restartAll()">لعب من جديد</button>
+  </div>
+
+  <footer class="note">
+    صُممت هذه اللعبة للاحتفال بذكرى المولد النبوي الشريف، سائلين الله أن ينفع بها ويجعلها في ميزان حسناتنا.
+  </footer>
+</div>
+</div>
+</div>
+
+<script>
+const LANTERN_SVG = `<svg viewBox="0 0 16 20" xmlns="http://www.w3.org/2000/svg">
+  <path d="M8 0 L11 3 H5 Z" fill="#c9a24b"/>
+  <rect x="6.5" y="0" width="3" height="2" fill="#c9a24b"/>
+  <path d="M4 3 H12 L11 16 H5 Z" fill="#e8cd8a" stroke="#c9a24b" stroke-width="0.5"/>
+  <rect x="3" y="16" width="10" height="1.6" rx="0.5" fill="#c9a24b"/>
+  <path d="M8 17.6 L8 20" stroke="#c9a24b" stroke-width="0.8"/>
+  <rect x="6.8" y="6" width="2.4" height="7" fill="#7a2e2e" opacity="0.55"/>
+</svg>`;
+
+const CATEGORIES_HARD = [
+  {
+    id:'birth', name:'المولد والنشأة', icon:'🌙', hard:true,
+    questions:[
+      {q:'في أي سنة ميلادية تقريباً وُلد النبي ﷺ، بحسب ما رجحه أكثر المؤرخين؟', choices:['سنة 570م','سنة 590م','سنة 610م','سنة 622م'], correct:0,
+       exp:'يرجّح أكثر المؤرخين أن مولده ﷺ كان نحو سنة 570 للميلاد، في عام الفيل الذي حاول فيه أبرهة هدم الكعبة.'},
+      {q:'كم كان عمر النبي ﷺ حين توفيت والدته آمنة بنت وهب؟', choices:['أربع سنوات','ست سنوات','ثماني سنوات','عشر سنوات'], correct:1,
+       exp:'توفيت أمه آمنة رضي الله عنها وهو ابن ست سنوات، أثناء عودتهما من زيارة أخواله في المدينة، فتولت حضانته بعدها جدته ثم عمه.'},
+      {q:'من هي المرضعة التي أرضعت النبي ﷺ لفترة قصيرة قبل أن تكفله حليمة السعدية؟', choices:['ثويبة مولاة أبي لهب','بركة أم أيمن','أم الفضل','فاطمة بنت أسد'], correct:0,
+       exp:'أرضعته أولاً ثويبة، مولاة عمه أبي لهب، أياماً قليلة قبل أن تأخذه حليمة السعدية إلى البادية.'},
+      {q:'ماذا حدث في حادثة "شق الصدر" التي وقعت للنبي ﷺ وهو طفل في بادية بني سعد؟', choices:['شق الملَكان صدره وغسلا قلبه','أصيب بجرح أثناء اللعب','رأى رؤيا مزعجة','فقد الوعي من الحر'], correct:0,
+       exp:'أتاه ملَكان وهو يلعب فشقّا صدره واستخرجا قلبه وغسلاه بماء زمزم ثم أعاداه، وهي حادثة تطهير ربّاني أعدّته لحمل الرسالة.'},
+      {q:'كم كان عمر النبي ﷺ تقريباً حين تزوج خديجة بنت خويلد رضي الله عنها؟', choices:['ثمانية عشر عاماً','خمسة وعشرون عاماً','خمسة وثلاثون عاماً','أربعون عاماً'], correct:1,
+       exp:'تزوجها ﷺ وعمره نحو خمسة وعشرين عاماً، وكانت هي في الأربعين، وظلت زوجته الوحيدة حتى توفيت.'},
+      {q:'في حادثة إعادة بناء الكعبة والاختلاف حول من يضع الحجر الأسود، كم كان عمر النبي ﷺ تقريباً حين حكّمته قريش؟', choices:['خمس وعشرون سنة','ثلاثون سنة','خمس وثلاثون سنة','أربعون سنة'], correct:2,
+       exp:'وقعت هذه الحادثة قبل البعثة بنحو خمس سنوات، وعمره ﷺ نحو خمس وثلاثين سنة، حيث اقترح وضع الحجر في ثوب ليشارك زعماء القبائل جميعاً في رفعه.'},
+    ]
+  },
+  {
+    id:'dawah', name:'البعثة والدعوة', icon:'📖', hard:true,
+    questions:[
+      {q:'من هو قريب خديجة النصراني العالم بالكتب السابقة الذي بشّر النبي ﷺ بأنه نبي هذه الأمة حين أخبرته خديجة بما رآه في غار حراء؟', choices:['ورقة بن نوفل','عداس النصراني','بحيرا الراهب','سلمان الفارسي'], correct:0,
+       exp:'ورقة بن نوفل بن أسد، ابن عم خديجة، كان قد تنصّر وقرأ الكتب السابقة، فأخبرها أن ما رآه النبي ﷺ هو "الناموس الذي نزل على موسى".'},
+      {q:'كم استمرت مقاطعة قريش لبني هاشم وبني المطلب في شعب أبي طالب تقريباً؟', choices:['سنة واحدة','نحو ثلاث سنوات','خمس سنوات','عشر سنوات'], correct:1,
+       exp:'استمر الحصار والمقاطعة الاقتصادية والاجتماعية نحو ثلاث سنوات، عانى فيها بنو هاشم وبنو المطلب شدة كبيرة حتى نُقضت الصحيفة.'},
+      {q:'بم عُرفت السنة العاشرة من البعثة التي توفي فيها كل من خديجة رضي الله عنها وأبو طالب في مدة قريبة؟', choices:['عام الحزن','عام الوفود','عام الفتح','عام الرمادة'], correct:0,
+       exp:'سُميت "عام الحزن" لشدة ما أصاب النبي ﷺ من الحزن لفقد زوجته وسنده وحاميه في وقت متقارب.'},
+      {q:'إلى أي مدينة خرج النبي ﷺ طالباً النصرة بعد وفاة عمه أبي طالب، فآذاه أهلها ورضخوه بالحجارة؟', choices:['الطائف','خيبر','نجران','دومة الجندل'], correct:0,
+       exp:'خرج ﷺ إلى الطائف يطلب من ثقيف النصرة والإيواء، فردّوه أقبح رد وسلّطوا عليه سفهاءهم حتى أدموا قدميه الشريفتين.'},
+      {q:'في رحلة الطائف، من الذي عرض على النبي ﷺ أن يُطبق الأخشبين (الجبلين) على أهل الطائف عقاباً لهم، فرفض النبي ﷺ رحمة بهم؟', choices:['ملَك الجبال','جبريل عليه السلام','ميكائيل عليه السلام','رضوان خازن الجنة'], correct:0,
+       exp:'أرسل الله معه ملَك الجبال يستأذنه في ذلك، فقال النبي ﷺ: "بل أرجو أن يخرج الله من أصلابهم من يعبد الله وحده"، في مشهد عظيم من الرحمة.'},
+      {q:'في بيعة العقبة الأولى، كم كان عدد أهل يثرب تقريباً الذين بايعوا النبي ﷺ وكانوا نواة انتشار الإسلام في المدينة؟', choices:['ستة نفر','اثنا عشر رجلاً','سبعون رجلاً وامرأتان','مئة رجل'], correct:1,
+       exp:'بايعه في العقبة الأولى اثنا عشر رجلاً من الأوس والخزرج على عدم الشرك والسرقة والزنا، ثم أرسل معهم مصعب بن عمير معلماً.'},
+    ]
+  },
+  {
+    id:'hijra', name:'الهجرة النبوية', icon:'🐪', hard:true,
+    questions:[
+      {q:'من هو الصحابي، مولى أبي بكر، الذي كان يرعى الغنم ويطمس آثار أقدام النبي ﷺ وأبي بكر بالقطيع أثناء الهجرة؟', choices:['عامر بن فهيرة','زيد بن حارثة','بلال بن رباح','أبو رافع'], correct:0,
+       exp:'كان عامر بن فهيرة، مولى أبي بكر، يتبعهما بالغنم فيمحو آثار أقدامهما حتى لا يهتدي بها المتعقبون من قريش.'},
+      {q:'من هو الرجل الذي طمع في جائزة قريش وحاول اللحاق بالنبي ﷺ وأبي بكر، فساخت قدما فرسه في الأرض فطلب الأمان؟', choices:['سراقة بن مالك','أبو جهل','أُبي بن خلف','عتبة بن ربيعة'], correct:0,
+       exp:'سراقة بن مالك تعقّبهما طمعاً في جائزة قريش، فساخت قوائم فرسه مرات، فأدرك أن الأمر إلهي وطلب الأمان وعاد من حيث أتى.'},
+      {q:'من هي ابنة أبي بكر التي كانت تحمل الطعام إلى النبي ﷺ وأبيها في غار ثور، ولُقّبت بـ"ذات النطاقين"؟', choices:['عائشة بنت أبي بكر','أسماء بنت أبي بكر','أم رومان','أم كلثوم بنت أبي بكر'], correct:1,
+       exp:'أسماء بنت أبي بكر رضي الله عنها شقت نطاقها (حزامها) نصفين لتربط بهما الطعام والسقاء، فلُقّبت بـ"ذات النطاقين".'},
+      {q:'من هو الصحابي الذي بات في فراش النبي ﷺ ليلة الهجرة متزملاً ببرده، ليوهم المشركين ببقائه فيؤخر اكتشافهم خروجه؟', choices:['علي بن أبي طالب','أبو بكر الصديق','عمر بن الخطاب','طلحة بن عبيد الله'], correct:0,
+       exp:'نام علي بن أبي طالب رضي الله عنه في فراش النبي ﷺ تلك الليلة الخطيرة، وأدى الأمانات التي كانت عند النبي ﷺ للناس قبل لحاقه بالمدينة.'},
+      {q:'في أي مكان بضواحي المدينة نزل النبي ﷺ أولاً عند بني عمرو بن عوف، قبل دخوله المدينة نفسها؟', choices:['قباء','بدر','أُحد','ذي الحليفة'], correct:0,
+       exp:'نزل النبي ﷺ أولاً في قباء وأقام فيها أياماً أسس خلالها أول مسجد في الإسلام، قبل أن يواصل المسير إلى المدينة.'},
+      {q:'من هو الحبر اليهودي من علماء المدينة الذي أسلم فور قدوم النبي ﷺ حين تحقق من الصفات التي وجدها في كتبهم؟', choices:['عبد الله بن سلام','كعب الأحبار','حيي بن أخطب','سلام بن مشكم'], correct:0,
+       exp:'كان عبد الله بن سلام من كبار أحبار يهود المدينة، فلما رأى وجه النبي ﷺ قال: "ليس بوجه كذاب"، وأسلم فور قدومه.'},
+    ]
+  },
+  {
+    id:'ghazawat', name:'الغزوات والأحداث الكبرى', icon:'🛡️', hard:true,
+    questions:[
+      {q:'من هو قائد المشركين في غزوة بدر الذي قُتل فيها، وكان من أشد أعداء الإسلام حتى لُقّب بـ"فرعون هذه الأمة"؟', choices:['أبو جهل (عمرو بن هشام)','أبو سفيان بن حرب','أُبي بن خلف','عتبة بن ربيعة'], correct:0,
+       exp:'قُتل أبو جهل في غزوة بدر على يد ابني عفراء من الأنصار، وكان أشد المشركين عداوة للإسلام، وقد سُرّ النبي ﷺ بخبر مقتله كثيراً.'},
+      {q:'من هو قائد الرماة الذين أمرهم النبي ﷺ بالثبات على جبل الرماة في غزوة أحد، فخالف كثير منهم الأمر؟', choices:['عبد الله بن جبير','خالد بن الوليد','الزبير بن العوام','سعد بن أبي وقاص'], correct:0,
+       exp:'عيّن النبي ﷺ عبد الله بن جبير قائداً على الرماة وأمرهم بعدم مغادرة الجبل مهما حدث، فلما نزل أكثرهم طمعاً بالغنيمة انقلبت الدائرة على المسلمين.'},
+      {q:'أي قبيلة يهودية في المدينة نقضت عهدها مع المسلمين وتحالفت مع الأحزاب أثناء حصار الخندق؟', choices:['بنو قريظة','بنو قينقاع','بنو النضير','بنو زهرة'], correct:0,
+       exp:'نقضت بنو قريظة عهدها مع النبي ﷺ في أحرج الأوقات أثناء غزوة الخندق، مما زاد الموقف خطورة على المسلمين.'},
+      {q:'من الصحابي الذي بارز الفارس المشرك عمرو بن ود العامري وقتله في غزوة الخندق بعد أن عجز عن مبارزته أحد؟', choices:['علي بن أبي طالب','حمزة بن عبد المطلب','الزبير بن العوام','سعد بن معاذ'], correct:0,
+       exp:'كان عمرو بن ود من أشجع فرسان العرب، فبارزه علي بن أبي طالب رضي الله عنه وقتله، فقال النبي ﷺ إن مبارزته كانت خيراً من عمل الأمة.'},
+      {q:'في حصار أي مدينة استخدم المسلمون المنجنيق لأول مرة؟', choices:['الطائف','خيبر','مكة','تبوك'], correct:0,
+       exp:'استخدم النبي ﷺ المنجنيق في حصار الطائف بعد غزوة حنين، وهي أول مرة يُستعمل فيها هذا السلاح في الإسلام.'},
+      {q:'في غزوة حنين، ماذا حدث للمسلمين في بداية المعركة رغم كثرة عددهم غير المسبوقة؟', choices:['انهزموا وتفرقوا في البداية ثم ثبت النبي ﷺ ومن معه','انتصروا فوراً دون قتال','رفضوا القتال','انسحبوا قبل بدء المعركة'], correct:0,
+       exp:'أُعجب بعض المسلمين بكثرة عددهم فقالوا لن نُغلب اليوم، فانهزموا في بداية المعركة، ثم ثبت النبي ﷺ وثلة من أصحابه حتى عادت الكرة للمسلمين، كما وصف القرآن في سورة التوبة.'},
+    ]
+  },
+  {
+    id:'akhlaq', name:'الأخلاق والشمائل', icon:'🌿', hard:true,
+    questions:[
+      {q:'ماذا دعا به النبي ﷺ لأهل الطائف حين عُرض عليه الانتقام منهم بعد أن آذوه أشد الأذى؟', choices:['اللهم اهد قومي فإنهم لا يعلمون','اللهم أهلكهم جميعاً','اللهم العنهم أبداً','اللهم لا تمهلهم'], correct:0,
+       exp:'رغم شدة ما لقيه من أهل الطائف، دعا لهم بالهداية لا بالهلاك، في مشهد عظيم من الرحمة والصبر على الأذى.'},
+      {q:'بحسب حديث عائشة رضي الله عنها، ماذا كان النبي ﷺ يفعل في بيته من أعمال يومية؟', choices:['كان يخدم نفسه ويخيط ثوبه ويخصف نعله','كان يترك كل الأعمال لخدمه','لم يشارك في أعمال البيت إطلاقاً','كان يكتفي بالدعاء فقط'], correct:0,
+       exp:'سُئلت عائشة رضي الله عنها: ماذا كان النبي ﷺ يصنع في بيته؟ فقالت: "كان يخيط ثوبه ويخصف نعله ويعمل ما يعمل الرجال في بيوتهم"، وهذا من تواضعه ﷺ.'},
+      {q:'ما الحديث الذي يبيّن رحمة النبي ﷺ بالحيوان حين اشتكت له ناقة سوء معاملة صاحبها؟', choices:['أن ناقة أتته وذرفت عيناها فسأل عن صاحبها ووصّاه بالرفق بها','أن جملاً هرب منه فطارده','أن حماراً تكلم معه','لا يوجد حديث بهذا المعنى'], correct:0,
+       exp:'دخل النبي ﷺ حائطاً فأتته ناقة تئنّ وتذرف عيناها، فسأل عن صاحبها ووبّخه على إجاعتها وإتعابها، وأمره بالرفق بها.'},
+      {q:'ماذا قال النبي ﷺ ليؤكد المساواة أمام العدل حتى مع أقرب الناس إليه، حين شُفع له في امرأة سرقت؟', choices:['"والله لو أن فاطمة بنت محمد سرقت لقطعت يدها"','"سأعفو عنها هذه المرة فقط"','"العدل لا يُطبق على الأقارب"','"سأستشير كبار الصحابة"'], correct:0,
+       exp:'حين حاول أسامة بن زيد الشفاعة في حد السرقة، غضب النبي ﷺ وقال هذه الكلمة الخالدة، مؤكداً أن الشريعة تسوي بين الناس جميعاً.'},
+      {q:'في حديث الأعرابي الذي جذب رداء النبي ﷺ بشدة حتى أثّر في رقبته الشريفة وطلب منه المال بجفاء، كيف كان رد فعل النبي ﷺ؟', choices:['ابتسم وأمر له بعطاء مما عنده','أمر بطرده وتأديبه','غضب وزجره بشدة','تجاهله ومضى'], correct:0,
+       exp:'رغم الأذى الجسدي الذي لحقه من جذبة الأعرابي القوية، ابتسم النبي ﷺ وأمر له بعطاء، وهو مثال بالغ في الحلم وسعة الصدر.'},
+      {q:'ماذا قال النبي ﷺ عن قيمة التبسم في وجه الآخرين؟', choices:['"تبسمك في وجه أخيك صدقة"','"التبسم مكروه في الإسلام"','لم يتحدث عن التبسم','"التبسم يُضعف الهيبة"'], correct:0,
+       exp:'من الأحاديث المشهورة في تعامله ﷺ مع الناس: "تبسمك في وجه أخيك صدقة"، وكان ﷺ معروفاً بدوام البِشر وطلاقة الوجه.'},
+    ]
+  },
+  {
+    id:'family', name:'الأسرة والصحابة', icon:'👪', hard:true,
+    questions:[
+      {q:'من هو أول سفير في تاريخ الإسلام، الذي أرسله النبي ﷺ إلى المدينة قبل الهجرة ليعلّم الأنصار القرآن والدين؟', choices:['مصعب بن عمير','عمار بن ياسر','معاذ بن جبل','عبد الله بن رواحة'], correct:0,
+       exp:'أرسل النبي ﷺ مصعب بن عمير رضي الله عنه بعد بيعة العقبة الأولى إلى المدينة، فكان أول من حمل لواء الدعوة والتعليم هناك.'},
+      {q:'من هو الصحابي القائد الذي لُقّب بـ"سيف الله المسلول" لبراعته العسكرية بعد إسلامه؟', choices:['خالد بن الوليد','عمرو بن العاص','أبو عبيدة بن الجراح','سعد بن أبي وقاص'], correct:0,
+       exp:'خالد بن الوليد رضي الله عنه أسلم بعد صلح الحديبية، وأطلق عليه النبي ﷺ لقب "سيف الله المسلول" لكثرة انتصاراته العسكرية.'},
+      {q:'من هو الصحابي الذي لُقّب بـ"ترجمان القرآن" لعلمه الواسع بتفسيره، وكان ابن عم النبي ﷺ؟', choices:['عبد الله بن عباس','عبد الله بن مسعود','أُبي بن كعب','زيد بن ثابت'], correct:0,
+       exp:'عبد الله بن عباس رضي الله عنهما دعا له النبي ﷺ بقوله: "اللهم فقهه في الدين وعلّمه التأويل"، فاشتهر بتفسير القرآن حتى لُقّب بحبر الأمة وترجمان القرآن.'},
+      {q:'من هي أول شهيدة في الإسلام، التي عُذبت حتى الموت على يد أبي جهل؟', choices:['سمية بنت خباط','أم عمارة','خديجة بنت خويلد','أسماء بنت أبي بكر'], correct:0,
+       exp:'سمية بنت خباط، أم عمار بن ياسر، عُذبت أشد العذاب لثباتها على الإسلام حتى قتلها أبو جهل، فكانت أول شهيدة في تاريخ الإسلام.'},
+      {q:'من الصحابي الذي قال عنه النبي ﷺ: "من أحب أن يقرأ القرآن غضّاً كما أُنزل فليقرأه على قراءة ابن أم عبد"؟', choices:['عبد الله بن مسعود','أُبي بن كعب','معاذ بن جبل','سالم مولى أبي حذيفة'], correct:0,
+       exp:'"ابن أم عبد" هو عبد الله بن مسعود رضي الله عنه، وكان من أوائل من أسلم، وأشاد النبي ﷺ بحسن قراءته وضبطه للقرآن.'},
+      {q:'من هو الصحابي الذي استشهد في مؤتة وقُطعت يداه فحمل الراية بعضديه، ولُقّب لذلك بـ"جعفر الطيار"؟', choices:['جعفر بن أبي طالب','زيد بن حارثة','عبد الله بن رواحة','أسامة بن زيد'], correct:0,
+       exp:'جعفر بن أبي طالب، أخو علي وابن عم النبي ﷺ، قاتل حتى قُطعت يداه فحمل الراية بعضديه حتى استشهد، وأخبر النبي ﷺ أن الله أبدله جناحين يطير بهما في الجنة.'},
+    ]
+  },
+  {
+    id:'wives', name:'أمهات المؤمنين', icon:'🌹', hard:true,
+    questions:[
+      {q:'كم كان عدد زوجات النبي ﷺ اللاتي كنّ في عصمته عند وفاته؟', choices:['خمس','سبع','تسع','إحدى عشرة'], correct:2,
+       exp:'كان في عصمته ﷺ عند وفاته تسع زوجات رضي الله عنهن، يُعرفن بـ"أمهات المؤمنين".'},
+      {q:'من زوجة النبي ﷺ التي كانت متزوجة من زيد بن حارثة قبله، ونزل بشأنها قرآن؟', choices:['زينب بنت جحش','جويرية بنت الحارث','صفية بنت حيي','ميمونة بنت الحارث'], correct:0,
+       exp:'زينب بنت جحش رضي الله عنها كانت زوجة زيد بن حارثة (مولى النبي ﷺ ثم ابنه بالتبني)، وتزوجها النبي ﷺ بعد طلاقها بأمر إلهي أبطل به عادة التبني في الجاهلية.'},
+      {q:'أي زوجات النبي ﷺ كانت يهودية الأصل من بني النضير، ثم أسلمت وتزوجها؟', choices:['صفية بنت حيي','أم حبيبة','سودة بنت زمعة','حفصة بنت عمر'], correct:0,
+       exp:'صفية بنت حيي بن أخطب رضي الله عنها كانت من بني النضير، وقعت في سبي خيبر ثم أسلمت وتزوجها النبي ﷺ.'},
+      {q:'من زوجة النبي ﷺ التي لُقّبت بـ"أم المساكين" لكثرة إحسانها إليهم؟', choices:['زينب بنت خزيمة','أم سلمة','سودة بنت زمعة','ميمونة بنت الحارث'], correct:0,
+       exp:'زينب بنت خزيمة رضي الله عنها عُرفت بهذا اللقب حتى قبل الإسلام لكرمها وعطفها على الفقراء والمساكين.'},
+      {q:'من هي الزوجة الوحيدة للنبي ﷺ من أصل قبطي مصري، وأم ابنه إبراهيم؟', choices:['مارية القبطية','ريحانة بنت زيد','جويرية بنت الحارث','أم حبيبة'], correct:0,
+       exp:'مارية القبطية رضي الله عنها أهداها المقوقس عظيم مصر للنبي ﷺ، وولدت له ابنه إبراهيم الذي توفي طفلاً.'},
+      {q:'أي زوجات النبي ﷺ اشتهرت بروايتها الكثيرة للحديث النبوي وفقهها الواسع؟', choices:['عائشة بنت أبي بكر','حفصة بنت عمر','أم حبيبة بنت أبي سفيان','سودة بنت زمعة'], correct:0,
+       exp:'عائشة رضي الله عنها من أكثر الصحابة رواية للحديث، وكانت مرجعاً للصحابة في الفقه وتفسير القرآن.'},
+    ]
+  },
+  {
+    id:'miracles', name:'المعجزات والآيات', icon:'✨', hard:true,
+    questions:[
+      {q:'في أي سورة ورد ذكر معجزة انشقاق القمر؟', choices:['سورة القمر','سورة النجم','سورة الإسراء','سورة يس'], correct:0,
+       exp:'وردت هذه المعجزة في مطلع سورة القمر: "اقتربت الساعة وانشق القمر"، وقد وقعت في مكة قبل الهجرة.'},
+      {q:'في أي غزوة تفجرت المياه من بين أصابع النبي ﷺ لإرواء المسلمين العطشى؟', choices:['غزوة تبوك','صلح الحديبية','غزوة بدر','غزوة أحد'], correct:1,
+       exp:'وقعت هذه المعجزة في عام الحديبية حين قلّ الماء، فوضع النبي ﷺ يده في الإناء ففاض الماء من بين أصابعه حتى شرب الجميع وتوضؤوا.'},
+      {q:'ما اسم الجذع الذي كان يستند إليه النبي ﷺ وهو يخطب، وحنّ (بكى) لفراقه حين اتُّخذ له منبر؟', choices:['جذع النخلة','عمود المسجد','باب المسجد','سارية الروضة'], correct:0,
+       exp:'كان النبي ﷺ يخطب مستنداً إلى جذع نخلة، فلما صُنع له منبر وتركه، سُمع للجذع صوت حنين حتى نزل إليه النبي ﷺ وضمّه فسكن.'},
+      {q:'كم عدد الصلوات التي فُرضت أولاً ليلة المعراج قبل أن تُخفف إلى خمس؟', choices:['عشرون','ثلاثون','خمسون','مئة'], correct:2,
+       exp:'فُرضت خمسون صلاة أولاً، ثم خفّفها الله تعالى تدريجياً إلى خمس صلوات بعد أن راجع النبي ﷺ ربه بمشورة موسى عليه السلام، وهي في الأجر كخمسين.'},
+      {q:'في غزوة الخندق، أي معجزة وقعت في طعام جابر بن عبد الله حين دعا النبي ﷺ الصحابة إليه؟', choices:['بركة الطعام القليل حتى أطعم الجميع','تحول الطعام إلى ذهب','نزول طعام من السماء','توقف الجوع عن الجميع بلا طعام'], correct:0,
+       exp:'كان طعام جابر رضي الله عنه قليلاً لا يكفي إلا لأهله، فدعا النبي ﷺ فيه بالبركة فأطعم منه جميع أهل الخندق وبقي منه.'},
+      {q:'ما اسم الملَك الذي كان ينزل بالوحي على النبي ﷺ، ويُسمى في القرآن أيضاً "الروح الأمين"؟', choices:['جبريل عليه السلام','ميكائيل عليه السلام','إسرافيل عليه السلام','مالك عليه السلام'], correct:0,
+       exp:'هو جبريل عليه السلام، وقد وصفه القرآن بـ"الروح الأمين" في سورة الشعراء، وهو الملَك المكلف بإنزال الوحي على الأنبياء.'},
+    ]
+  },
+  {
+    id:'ansar', name:'الأنصار والمهاجرون', icon:'🤝', hard:true,
+    questions:[
+      {q:'ما الاسم الذي أُطلق على الرابطة التي أقامها النبي ﷺ بين المهاجرين والأنصار في المدينة؟', choices:['المؤاخاة','الموادعة','البيعة','الهدنة'], correct:0,
+       exp:'"المؤاخاة" هي الرابطة الأخوية التي عقدها النبي ﷺ بين كل مهاجر وأنصاري، فتشاركوا حتى في الميراث في بداية الأمر.'},
+      {q:'حين آخى النبي ﷺ بين عبد الرحمن بن عوف وسعد بن الربيع، وعرض سعد أن يقاسمه ماله وإحدى زوجتيه، بماذا أجابه عبد الرحمن؟', choices:['دلّوني على السوق','قبِلت العرض كاملاً','رفض المؤاخاة','طلب المزيد من المال'], correct:0,
+       exp:'فضّل عبد الرحمن بن عوف رضي الله عنه أن يُدلّه سعد على السوق ليتاجر بنفسه، فبارك الله له حتى أصبح من أثرى الصحابة.'},
+      {q:'ما اللقب الذي أُطلق على أهل المدينة الذين آووا النبي ﷺ والمهاجرين ونصروهم؟', choices:['الأنصار','الموالي','الأحلاف','الأشراف'], correct:0,
+       exp:'سُمي أهل المدينة من الأوس والخزرج بـ"الأنصار" لنصرتهم النبي ﷺ وإيوائهم المهاجرين من مكة.'},
+      {q:'ما اسم الوثيقة التي نظّم بها النبي ﷺ العلاقة بين مسلمي المدينة ويهودها بعد الهجرة؟', choices:['صحيفة المدينة','معاهدة الحديبية','ميثاق قريظة','عهدة الأمان'], correct:0,
+       exp:'"صحيفة المدينة" وثيقة دستورية نظّمت العلاقة بين المسلمين ومختلف قبائل وطوائف المدينة، وتُعد من أقدم الدساتير المكتوبة في التاريخ.'},
+      {q:'من هما القبيلتان الرئيسيتان اللتان شكّلتا الأنصار في المدينة قبل الإسلام وكانتا متنازعتين؟', choices:['الأوس والخزرج','قريش وثقيف','هوازن وغطفان','بنو النضير وبنو قينقاع'], correct:0,
+       exp:'كان الأوس والخزرج قبيلتين عربيتين في المدينة بينهما عداوة قديمة، فألّف الإسلام بين قلوبهم وأصبحا معاً "الأنصار".'},
+      {q:'في أي بيعة التقى وفد من الأنصار بالنبي ﷺ سراً عند العقبة قرب مكة وبايعوه على نصرته وإيوائه؟', choices:['بيعة العقبة الثانية','بيعة الرضوان','بيعة الشجرة','بيعة الفتح'], correct:0,
+       exp:'في بيعة العقبة الثانية بايع وفد من الأنصار (نحو 73 رجلاً وامرأتين) النبي ﷺ على حمايته والهجرة إليهم، وكانت تمهيداً مباشراً للهجرة النبوية.'},
+    ]
+  },
+  {
+    id:'numbers', name:'أرقام وتواريخ دقيقة', icon:'🔢', hard:true,
+    questions:[
+      {q:'كم استمرت فترة الدعوة السرية في مكة قبل أن يجهر النبي ﷺ بالدعوة علناً؟', choices:['سنة واحدة','نحو ثلاث سنين','خمس سنين','عشر سنين'], correct:1,
+       exp:'استمرت الدعوة سرية نحو ثلاث سنوات بعد نزول الوحي، ثم أمر الله تعالى النبي ﷺ بالجهر بالدعوة.'},
+      {q:'كم بلغ تقريباً عدد المسلمين الذين خرجوا للقتال في غزوة بدر الكبرى؟', choices:['نحو 100','نحو 313','نحو 700','نحو 1000'], correct:1,
+       exp:'خرج للمسلمين في بدر نحو 313 مقاتلاً، في مقابل جيش قريش الذي بلغ نحو ألف مقاتل، ومع ذلك نصرهم الله.'},
+      {q:'في غزوة أحد، خرج جيش المسلمين نحو ألف مقاتل، فكم بقي منهم فعلياً بعد انسحاب المنافقين بقيادة عبد الله بن أُبي؟', choices:['300','500','700','900'], correct:2,
+       exp:'انسحب نحو 300 من المنافقين بقيادة عبد الله بن أُبي بن سلول، فبقي مع النبي ﷺ نحو 700 مقاتل فقط.'},
+      {q:'كم استمرت الفترة المكية من الدعوة (من البعثة إلى الهجرة) بالسنين؟', choices:['عشر سنين','ثلاث عشرة سنة','عشرون سنة','خمس وعشرون سنة'], correct:1,
+       exp:'استمرت الفترة المكية نحو ثلاث عشرة سنة (من البعثة سنة 610م إلى الهجرة سنة 622م)، وأكملت الفترة المدنية 23 سنة من الدعوة بأكملها.'},
+      {q:'تقريباً كم بلغ عدد جيش الأحزاب (المتحالفين من قريش وغطفان واليهود) في غزوة الخندق؟', choices:['ألف مقاتل','ثلاثة آلاف','عشرة آلاف','خمسون ألفاً'], correct:2,
+       exp:'بلغ جيش الأحزاب المتحالف نحو عشرة آلاف مقاتل، في مقابل نحو ثلاثة آلاف من المسلمين، فحفروا الخندق دفاعاً عن المدينة.'},
+      {q:'كم كان عدد المسلمين الذين خرجوا مع النبي ﷺ لفتح مكة، وهو أكبر جيش إسلامي حتى ذلك الوقت؟', choices:['ألفان','خمسة آلاف','عشرة آلاف','عشرون ألفاً'], correct:2,
+       exp:'خرج النبي ﷺ لفتح مكة بجيش بلغ نحو عشرة آلاف مقاتل، وهو أكبر جيش تجمّع للمسلمين حتى ذلك التاريخ.'},
+    ]
+  },
+  {
+    id:'titles', name:'أسماء وألقاب النبي ﷺ', icon:'🕌', hard:true,
+    questions:[
+      {q:'بأي اسم بشّر عيسى عليه السلام قومه بمجيء النبي ﷺ، كما ورد في القرآن الكريم؟', choices:['أحمد','طه','ياسين','المصطفى'], correct:0,
+       exp:'ورد في سورة الصف أن عيسى عليه السلام قال: "ومبشراً برسول يأتي من بعدي اسمه أحمد"، وهو اسم من أسماء النبي ﷺ.'},
+      {q:'ماذا يعني وصف النبي ﷺ بـ"خاتم النبيين" الوارد في القرآن؟', choices:['أنه آخر الأنبياء ولا نبي بعده','أنه أفضل الأنبياء فقط','أنه خاتم من ذهب يلبسه','أنه أول الأنبياء'], correct:0,
+       exp:'"خاتم النبيين" تعني أنه ﷺ آخر الأنبياء والمرسلين، وقد ختم الله به الرسالات السماوية فلا نبي بعده.'},
+      {q:'في أي سورة وردت الآية: "وما أرسلناك إلا رحمة للعالمين"؟', choices:['سورة الأنبياء','سورة آل عمران','سورة يوسف','سورة الكهف'], correct:0,
+       exp:'وردت هذه الآية في سورة الأنبياء، وهي من أجمع الأوصاف القرآنية لرسالته ﷺ التي عمّت الرحمة فيها كل العالمين.'},
+      {q:'بأي لقب وُصف النبي ﷺ في قوله تعالى: "يا أيها النبي إنا أرسلناك شاهداً ومبشراً ونذيراً... وسراجاً منيراً"؟', choices:['السراج المنير','الصادق الأمين','الهادي المهدي','أبو القاسم'], correct:0,
+       exp:'وصفه الله تعالى في سورة الأحزاب بأنه "سراج منير"، أي نوراً يُهتدى به ويُستضاء بهديه في الظلمات.'},
+      {q:'ما هي كنية النبي ﷺ المشهورة نسبة إلى أكبر أبنائه؟', choices:['أبو القاسم','أبو إبراهيم','أبو الحسن','أبو عبد الله'], correct:0,
+       exp:'كنيته المشهورة "أبو القاسم"، نسبة إلى ابنه البِكر القاسم الذي توفي في صغره.'},
+      {q:'أي اسم من أسمائه ﷺ ورد بمعنى "المحمود كثيراً"، وهو اسمه العلَم المعروف؟', choices:['محمد','أحمد','طه','المصطفى'], correct:0,
+       exp:'اسمه "محمد" مشتق من الحمد، ومعناه من يُحمد كثيراً لكثرة خصاله الحميدة، وهو الاسم الذي اختاره له جده عبد المطلب.'},
+    ]
+  },
+  {
+    id:'wafat', name:'الوفاة والفراق', icon:'🕊️', hard:true,
+    questions:[
+      {q:'في أي سنة هجرية توفي النبي ﷺ؟', choices:['التاسعة','العاشرة','الحادية عشرة','الثانية عشرة'], correct:2,
+       exp:'توفي النبي ﷺ في السنة الحادية عشرة للهجرة، الموافقة لسنة 632م، بعد عام واحد فقط من حجة الوداع.'},
+      {q:'كم كان عمر النبي ﷺ تقريباً حين توفي، بالحساب القمري؟', choices:['ستون عاماً','ثلاثة وستون عاماً','سبعون عاماً','خمسة وسبعون عاماً'], correct:1,
+       exp:'توفي النبي ﷺ وعمره ثلاثة وستون عاماً بالتقويم القمري، بعد ثلاث وعشرين سنة قضاها في الدعوة والرسالة.'},
+      {q:'أين دُفن النبي ﷺ بعد وفاته؟', choices:['في مسجد قباء','في المكان الذي توفي فيه، بحجرة عائشة','في مقبرة البقيع','في مكة المكرمة'], correct:1,
+       exp:'دُفن النبي ﷺ في المكان الذي قُبض فيه، وهو حجرة السيدة عائشة رضي الله عنها الملاصقة للمسجد النبوي، عملاً بقول "ما قُبض نبي إلا دُفن حيث يُقبض".'},
+      {q:'ما اسم الحجة التي أداها النبي ﷺ قبل وفاته بأشهر قليلة، وألقى فيها خطبته الجامعة؟', choices:['حجة الوداع','عمرة القضاء','حجة الإسلام الأولى','عمرة الحديبية'], correct:0,
+       exp:'حجة الوداع هي الحجة الوحيدة التي أداها النبي ﷺ بعد الهجرة، في السنة العاشرة، وألقى فيها خطبته المشهورة بخطبة الوداع.'},
+      {q:'أين ألقى النبي ﷺ خطبة الوداع الجامعة لأهم مبادئ الإسلام؟', choices:['في المسجد الحرام','في عرفة','في منى فقط','في المدينة المنورة'], correct:1,
+       exp:'ألقى النبي ﷺ خطبة الوداع في عرفة أثناء حجة الوداع، وتضمنت وصايا عظيمة في حرمة الدماء والأموال والمساواة بين الناس.'},
+      {q:'من بويع خليفة للمسلمين مباشرة بعد وفاة النبي ﷺ؟', choices:['أبو بكر الصديق','عمر بن الخطاب','عثمان بن عفان','علي بن أبي طالب'], correct:0,
+       exp:'بويع أبو بكر الصديق رضي الله عنه خليفة للمسلمين بعد وفاة النبي ﷺ مباشرة، وهو أول الخلفاء الراشدين.'},
+    ]
+  },
+];
+
+const CATEGORIES_EASY = [
+  {
+    id:'e-birth', name:'المولد والنشأة', icon:'🌙',
+    questions:[
+      {q:'في أي شهر هجري وُلد النبي ﷺ بحسب المشهور عند أكثر العلماء؟', choices:['ربيع الأول','رجب','رمضان','شوال'], correct:0,
+       exp:'وُلد النبي ﷺ في مكة المكرمة في شهر ربيع الأول، في عام يُعرف بـ"عام الفيل".'},
+      {q:'ما اسم والد النبي ﷺ؟', choices:['عبد المطلب','عبد الله','أبو طالب','العباس'], correct:1,
+       exp:'والده هو عبد الله بن عبد المطلب، وقد توفي قبل مولد النبي ﷺ.'},
+      {q:'من هي المرضعة التي أرضعت النبي ﷺ في البادية؟', choices:['آمنة بنت وهب','أم أيمن','حليمة السعدية','أم سلمة'], correct:2,
+       exp:'أرضعته حليمة السعدية من بني سعد، وكانت من عادة العرب إرسال أبنائهم للبادية لينشأوا أقوياء وفصحاء.'},
+      {q:'من كفل النبي ﷺ بعد وفاة جده عبد المطلب؟', choices:['عمه أبو طالب','عمه العباس','خاله','جاره'], correct:0,
+       exp:'تكفّل بتربيته عمه أبو طالب، وكان له سنداً وحماية طوال حياته.'},
+      {q:'بأي لقب عُرف النبي ﷺ بين قومه قبل البعثة لصدقه وأمانته؟', choices:['الفاروق','الصادق الأمين','السراج المنير','الكريم'], correct:1,
+       exp:'اشتهر بين قريش بلقب "الصادق الأمين" لصدقه وأمانته حتى قبل البعثة.'},
+    ]
+  },
+  {
+    id:'e-dawah', name:'البعثة والدعوة', icon:'📖',
+    questions:[
+      {q:'في أي غار نزل الوحي على النبي ﷺ أول مرة؟', choices:['غار ثور','غار حراء','غار الشعب','غار الأبطح'], correct:1,
+       exp:'نزل الوحي عليه أول مرة في غار حراء، حيث كان يتعبد بعيداً عن ضجيج مكة.'},
+      {q:'ما أول كلمة نزلت في القرآن على النبي ﷺ؟', choices:['اقرأ','قل','يا أيها','الحمد'], correct:0,
+       exp:'كانت أول الآيات نزولاً مطلعها "اقرأ باسم ربك الذي خلق"، حملها إليه الملَك جبريل عليه السلام.'},
+      {q:'من أول من آمن بالنبي ﷺ من الناس جميعاً؟', choices:['خديجة بنت خويلد','عمر بن الخطاب','أبو بكر الصديق','علي بن أبي طالب'], correct:0,
+       exp:'خديجة رضي الله عنها أول من آمن بالنبي ﷺ، وثبّتته حين نزل عليه الوحي أول مرة.'},
+      {q:'إلى أي بلد هاجر بعض الصحابة هجرتهم الأولى فراراً من أذى قريش؟', choices:['اليمن','الحبشة','فارس','الشام'], correct:1,
+       exp:'هاجروا إلى الحبشة حيث استقبلهم النجاشي، ملكها العادل، وحماهم من أذى قريش.'},
+      {q:'ما اسم الرحلة الليلية التي انتقل فيها النبي ﷺ من مكة إلى بيت المقدس ثم عُرج به إلى السماء؟', choices:['الهجرة','الإسراء والمعراج','الفتح','الغزوة'], correct:1,
+       exp:'الإسراء والمعراج رحلة مباركة انتقل فيها النبي ﷺ من مكة إلى بيت المقدس ثم إلى السماء في ليلة واحدة.'},
+    ]
+  },
+  {
+    id:'e-hijra', name:'الهجرة النبوية', icon:'🐪',
+    questions:[
+      {q:'من رافق النبي ﷺ في رحلة الهجرة إلى المدينة؟', choices:['عمر بن الخطاب','أبو بكر الصديق','علي بن أبي طالب','بلال بن رباح'], correct:1,
+       exp:'رافقه أبو بكر الصديق رضي الله عنه في هذه الرحلة المباركة.'},
+      {q:'في أي غار اختبأ النبي ﷺ وصاحبه أثناء الهجرة؟', choices:['غار حراء','غار ثور','غار أحد','غار الطائف'], correct:1,
+       exp:'اختبآ في غار ثور جنوب مكة حتى هدأ طلب قريش لهما، ثم تابعا الطريق إلى المدينة.'},
+      {q:'ما الاسم القديم لمدينة "المدينة المنورة" قبل الهجرة؟', choices:['يثرب','الطائف','خيبر','تبوك'], correct:0,
+       exp:'كانت تُعرف باسم "يثرب"، فسمّاها النبي ﷺ بعد الهجرة "المدينة المنورة".'},
+      {q:'ما اسم أول مسجد بُني في الإسلام؟', choices:['المسجد النبوي','مسجد قباء','المسجد الأقصى','مسجد الخيف'], correct:1,
+       exp:'مسجد قباء أول مسجد أُسس على التقوى، بناه النبي ﷺ عند وصوله ضواحي المدينة.'},
+      {q:'أي سنة ميلادية توافق سنة الهجرة النبوية؟', choices:['610م','622م','630م','632م'], correct:1,
+       exp:'وقعت الهجرة سنة 622 للميلاد، وهي بداية التقويم الهجري.'},
+    ]
+  },
+  {
+    id:'e-ghazawat', name:'الغزوات والأحداث الكبرى', icon:'🛡️',
+    questions:[
+      {q:'ما اسم أول معركة كبرى خاضها المسلمون ضد قريش؟', choices:['غزوة أحد','غزوة بدر','غزوة الخندق','غزوة حنين'], correct:1,
+       exp:'كانت غزوة بدر الكبرى أول مواجهة فاصلة، وانتصر فيها المسلمون رغم قلة عددهم.'},
+      {q:'ما الفكرة التي اقترحها سلمان الفارسي في غزوة الخندق؟', choices:['حفر خندق حول المدينة','الهجرة إلى مكان آخر','الصلح مع الأعداء','بناء سور حجري'], correct:0,
+       exp:'اقترح سلمان الفارسي حفر خندق حول المدينة، وهي خطة لم تعرفها العرب من قبل.'},
+      {q:'في أي سنة هجرية فتح المسلمون مكة المكرمة؟', choices:['السنة الثانية','السنة السادسة','السنة الثامنة','السنة العاشرة'], correct:2,
+       exp:'كان فتح مكة في السنة الثامنة للهجرة، ودخلها النبي ﷺ بلا قتال يُذكر.'},
+      {q:'ما اسم الصلح الذي عقده النبي ﷺ مع قريش قبل فتح مكة؟', choices:['صلح الحديبية','صلح المدينة','صلح الطائف','صلح خيبر'], correct:0,
+       exp:'صلح الحديبية معاهدة سلام مع قريش، سمّاها القرآن "فتحاً مبيناً".'},
+      {q:'ماذا قال النبي ﷺ لأهل مكة يوم الفتح رغم قدرته على الانتقام منهم؟', choices:['اذهبوا فأنتم الطلقاء','لا عفو ولا صفح','خذوا أموالكم واذهبوا','لن أدخل مكة'], correct:0,
+       exp:'قال لهم ﷺ: "اذهبوا فأنتم الطلقاء"، في أعظم مشاهد العفو.'},
+    ]
+  },
+  {
+    id:'e-akhlaq', name:'الأخلاق والشمائل', icon:'🌿',
+    questions:[
+      {q:'كيف وصف الله تعالى خُلق النبي ﷺ في القرآن الكريم؟', choices:['وإنك لعلى خلق عظيم','وإنك لأنت الرحيم','وإنك لصاحب الأمة','وإنك لخير البرية'], correct:0,
+       exp:'وصفه الله تعالى في سورة القلم بقوله: "وإنك لعلى خلق عظيم".'},
+      {q:'من الصحابية التي وصفت خُلق النبي ﷺ بأنه "كان خلقه القرآن"؟', choices:['عائشة أم المؤمنين','فاطمة الزهراء','أم سلمة','زينب بنت جحش'], correct:0,
+       exp:'قالت عائشة رضي الله عنها: "كان خلقه القرآن"، أي كان يطبق قيم القرآن في سلوكه.'},
+      {q:'بماذا كان النبي ﷺ يوصي أصحابه تجاه الجيران؟', choices:['الإحسان إليهم','تجاهلهم','التنافس معهم','عدم زيارتهم'], correct:0,
+       exp:'كان ﷺ يوصي بالإحسان إلى الجار حتى قال: "ما زال جبريل يوصيني بالجار".'},
+      {q:'ما موقف النبي ﷺ من إكرام الضيف؟', choices:['جعله جزءاً من كمال الإيمان','لم يتحدث عنه','اعتبره أمراً ثانوياً','خصّه بأصحابه فقط'], correct:0,
+       exp:'قال ﷺ: "من كان يؤمن بالله واليوم الآخر فليكرم ضيفه".'},
+      {q:'كيف تعامل النبي ﷺ مع الأعرابي الذي بال في المسجد؟', choices:['أمر بضربه فوراً','تركه حتى يفرغ ثم علّمه برفق','طرده من المسجد','لم يتدخل'], correct:1,
+       exp:'منع النبي ﷺ الصحابة من زجره، وعلّمه بلطف بعدها، درساً في الرفق بالجاهل.'},
+    ]
+  },
+  {
+    id:'e-family', name:'الأسرة والصحابة', icon:'👪',
+    questions:[
+      {q:'من هي ابنة النبي ﷺ التي تزوجها علي بن أبي طالب رضي الله عنه؟', choices:['فاطمة الزهراء','رقية','أم كلثوم','زينب'], correct:0,
+       exp:'فاطمة الزهراء أصغر بنات النبي ﷺ، وأم الحسن والحسين رضي الله عنهم.'},
+      {q:'من هما حفيدا النبي ﷺ اللذان وُصفا بأنهما "سيدا شباب أهل الجنة"؟', choices:['الحسن والحسين','عبد الله وعبيد الله','القاسم وإبراهيم','أسامة وزيد'], correct:0,
+       exp:'الحسن والحسين ابنا فاطمة وعلي رضي الله عنهم.'},
+      {q:'من هو الصحابي الذي عُرف بلقب "مؤذن الرسول ﷺ"؟', choices:['بلال بن رباح','صهيب الرومي','سلمان الفارسي','زيد بن ثابت'], correct:0,
+       exp:'بلال بن رباح رضي الله عنه أول مؤذن في الإسلام.'},
+      {q:'من الصحابي الذي جمع القرآن الكريم في مصحف واحد في عهد أبي بكر الصديق؟', choices:['زيد بن ثابت','معاذ بن جبل','أُبي بن كعب','عبد الله بن مسعود'], correct:0,
+       exp:'كلّف أبو بكر الصديق زيد بن ثابت رضي الله عنه بجمع القرآن الكريم في مصحف واحد.'},
+      {q:'من هي زوجة النبي ﷺ الأولى التي تزوجها قبل البعثة؟', choices:['عائشة بنت أبي بكر','خديجة بنت خويلد','حفصة بنت عمر','سودة بنت زمعة'], correct:1,
+       exp:'تزوج النبي ﷺ خديجة بنت خويلد رضي الله عنها، ولم يتزوج عليها حتى توفيت.'},
+    ]
+  },
+];
+
+let players = [
+  {name:'اللاعب الأول', score:0, lanterns:0},
+  {name:'اللاعب الثاني', score:0, lanterns:0},
+];
+let currentPlayer = 0;
+let currentCat = null;
+let currentQIndex = 0;
+let categoryDone = {};
+let anyPlayed = false;
+let ageMode = 'easy';
+
+function activeCategories(){
+  return ageMode === 'hard' ? CATEGORIES_HARD : CATEGORIES_EASY;
+}
+
+function selectAge(mode){
+  ageMode = mode;
+  $('age-easy').classList.toggle('selected', mode==='easy');
+  $('age-hard').classList.toggle('selected', mode==='hard');
+}
+
+function $(id){return document.getElementById(id);}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $(id).classList.add('active');
+  document.querySelectorAll('.app-topbar').forEach(b=>b.style.display='none');
+  const map = {'screen-categories':'topbar-categories', 'screen-question':'topbar-question', 'screen-end':'topbar-end'};
+  if(map[id]) $(map[id]).style.display = 'flex';
+}
+
+function goHome(){
+  showScreen('screen-setup');
+}
+
+function backToCategories(){
+  buildDoors();
+  showScreen('screen-categories');
+}
+
+function startGame(){
+  const n1 = $('input-p1').value.trim();
+  const n2 = $('input-p2').value.trim();
+  players[0].name = n1 || 'اللاعب الأول';
+  players[1].name = n2 || 'اللاعب الثاني';
+  $('scoreboard').style.display = 'flex';
+  updateScoreboard();
+  buildDoors();
+  showScreen('screen-categories');
+}
+
+function updateScoreboard(){
+  $('p1-name').textContent = players[0].name;
+  $('p2-name').textContent = players[1].name;
+  $('p1-score').textContent = players[0].score;
+  $('p2-score').textContent = players[1].score;
+  renderLanterns('p1-lanterns', players[0].lanterns);
+  renderLanterns('p2-lanterns', players[1].lanterns);
+}
+
+function renderLanterns(elId, count){
+  const el = $(elId);
+  el.innerHTML = '';
+  const total = 10;
+  for(let i=0;i<total;i++){
+    const d = document.createElement('div');
+    d.className = 'lantern' + (i < count ? ' lit' : '');
+    d.innerHTML = LANTERN_SVG;
+    el.appendChild(d);
+  }
+}
+
+function buildDoors(){
+  const doors = $('doors');
+  doors.innerHTML = '';
+  const levelText = ageMode === 'hard' ? 'مستوى: صعب جداً' : 'مستوى: سهل';
+  activeCategories().forEach(cat=>{
+    const done = categoryDone[cat.id] || 0;
+    const div = document.createElement('div');
+    div.className = 'door' + (ageMode==='hard' ? ' hard' : '') + (done >= cat.questions.length ? ' done' : '');
+    div.innerHTML = `
+      <span class="icon">${cat.icon}</span>
+      <div class="cname">${cat.name}</div>
+      <div class="cprog">${done}/${cat.questions.length}</div>
+      <span class="level-badge">${levelText}</span>
+      <button class="door-btn" aria-label="${cat.name}" onclick="openCategory('${cat.id}')"></button>
+    `;
+    doors.appendChild(div);
+  });
+}
+
+function openCategory(catId){
+  currentCat = activeCategories().find(c=>c.id===catId);
+  currentQIndex = categoryDone[catId] || 0;
+  if(currentQIndex >= currentCat.questions.length){
+    currentQIndex = 0; // replay from start if all done
+  }
+  showQuestion();
+}
+
+function showQuestion(){
+  anyPlayed = true;
+  const q = currentCat.questions[currentQIndex];
+  $('q-cat').textContent = `باب: ${currentCat.name}`;
+  $('q-turn').textContent = `دور: ${players[currentPlayer].name}`;
+  $('q-text').textContent = q.q;
+  const choicesEl = $('q-choices');
+  choicesEl.innerHTML = '';
+  q.choices.forEach((choice, idx)=>{
+    const btn = document.createElement('button');
+    btn.className = 'choice';
+    btn.textContent = choice;
+    btn.onclick = ()=>answerQuestion(idx);
+    choicesEl.appendChild(btn);
+  });
+  $('q-explain').classList.remove('show');
+  $('q-explain').textContent = '';
+  $('btn-next').classList.remove('show');
+  showScreen('screen-question');
+}
+
+function answerQuestion(idx){
+  const q = currentCat.questions[currentQIndex];
+  const buttons = document.querySelectorAll('#q-choices .choice');
+  buttons.forEach(b=>b.disabled = true);
+  buttons[q.correct].classList.add('correct');
+  if(idx !== q.correct){
+    buttons[idx].classList.add('wrong');
+  } else {
+    players[currentPlayer].score += 1;
+    if(players[currentPlayer].lanterns < 10) players[currentPlayer].lanterns += 1;
+    updateScoreboard();
+  }
+  $('q-explain').textContent = q.exp;
+  $('q-explain').classList.add('show');
+  $('btn-next').classList.add('show');
+}
+
+function nextAfterAnswer(){
+  categoryDone[currentCat.id] = Math.max(categoryDone[currentCat.id] || 0, currentQIndex + 1);
+  currentQIndex += 1;
+  currentPlayer = 1 - currentPlayer;
+
+  if(currentQIndex >= currentCat.questions.length){
+    buildDoors();
+    showScreen('screen-categories');
+  } else {
+    showQuestion();
+  }
+}
+
+function showEndIfPlayed(){
+  showEnd();
+}
+
+function showEnd(){
+  const p1 = players[0], p2 = players[1];
+  let winnerText;
+  if(p1.score > p2.score) winnerText = `🏆 مبروك، فاز ${p1.name}!`;
+  else if(p2.score > p1.score) winnerText = `🏆 مبروك، فاز ${p2.name}!`;
+  else winnerText = `🤝 تعادل جميل بينكما!`;
+  $('end-winner').textContent = winnerText;
+  $('end-p1-name').textContent = p1.name;
+  $('end-p1-score').textContent = p1.score;
+  $('end-p2-name').textContent = p2.name;
+  $('end-p2-score').textContent = p2.score;
+
+  const row = $('end-lanterns');
+  row.innerHTML = '';
+  const totalLit = Math.min(20, p1.lanterns + p2.lanterns);
+  for(let i=0;i<20;i++){
+    const d = document.createElement('div');
+    d.className = 'lantern' + (i < totalLit ? ' lit' : '');
+    d.style.width = '20px'; d.style.height='25px';
+    d.innerHTML = LANTERN_SVG;
+    row.appendChild(d);
+  }
+  showScreen('screen-end');
+}
+
+function restartAll(){
+  players = [
+    {name:players[0].name, score:0, lanterns:0},
+    {name:players[1].name, score:0, lanterns:0},
+  ];
+  currentPlayer = 0;
+  categoryDone = {};
+  updateScoreboard();
+  buildDoors();
+  showScreen('screen-categories');
+}
+</script>
+</body>
+</html>

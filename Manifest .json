@@ -1,0 +1,17 @@
+{
+  "name": "مسابقة السيرة النبوية",
+  "short_name": "السيرة النبوية",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0d2b23",
+  "theme_color": "#0d2b23",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3592/3592862.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
