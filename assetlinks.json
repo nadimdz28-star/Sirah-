@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.nadimdz28_star.twa",
+        "sha256_cert_fingerprints": ["35:71:21:80:0A:CD:A5:FA:BB:B3:74:F7:E8:92:EC:EA:03:89:C2:8A:37:26:06:4D:6D:2A:E8:C4:50:C4:4D:2F"]
+      }
+    }]
